@@ -49,11 +49,15 @@
             border-radius: 5px;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
             text-align: left;
-            width: 100%;
+            width: calc(100% - 2rem);
             height: 100px;
             overflow: hidden;
             position: relative;
             font-family: 'Courier New', monospace;
+        }
+
+        .terminal span.command {
+            color: #c678dd;
         }
 
         @keyframes blink {
@@ -95,7 +99,7 @@
         <div class="title">Мир Квт Рофланова</div>
         <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Хикки.</div>
         <div class="terminal" id="terminal">
-            kdev@world:~$ <span class="typed-text" id="typed-text"></span>
+            <span class="prompt">kdev@world:~$</span> <span class="typed-text" id="typed-text"></span>
         </div>
     </div>
 
