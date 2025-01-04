@@ -41,7 +41,7 @@ from ..inline.types import InlineCall, InlineQuery
 logger = logging.getLogger(__name__)
 
 
-class MyTimeMod(loader.Module):
+class UniversalTimesMod(loader.Module):
     """Модуль для установки дат по типу "сколько до дня рождения", или посмотреть часовой пояс какого-нибудь городка."""
 
     strings = {
