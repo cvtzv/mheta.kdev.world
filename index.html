@@ -55,26 +55,21 @@
             font-family: 'Courier New', monospace;
         }
 
-        .terminal::before {
-            content: 'kdev@world:~$';
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #c5c6c7;
-        }
-
-        .line {
-            display: block;
+        .terminal-line {
             color: #61dafb;
-            white-space: nowrap;
         }
 
-        @keyframes typing {
-            from {
-                width: 0;
-            }
-            to {
-                width: 100%;
-            }
+        .terminal-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
         }
 
         @keyframes blink {
@@ -90,23 +85,6 @@
             border-right: 2px solid #61dafb;
             animation: blink 0.7s step-end infinite;
         }
-
-        .terminal-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            overflow: hidden;
-        }
-
-        .terminal-line {
-            color: #61dafb;
-        }
     </style>
 </head>
 <body>
@@ -115,7 +93,7 @@
         <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Хикки.</div>
         <div class="terminal">
             <div class="terminal-content" id="terminal">
-                <!-- Commands will appear here -->
+                <!-- Commands will dynamically appear here -->
             </div>
         </div>
     </div>
@@ -133,33 +111,28 @@
 
         let commandIndex = 0;
         let charIndex = 0;
-        let currentLine = '';
+        let currentCommand = '';
 
         function typeCommand() {
             if (charIndex < commands[commandIndex].length) {
-                currentLine += commands[commandIndex][charIndex];
+                currentCommand += commands[commandIndex][charIndex];
                 charIndex++;
                 renderTerminal();
                 setTimeout(typeCommand, 100);
             } else {
-                setTimeout(deleteCommand, 1000);
-            }
-        }
-
-        function deleteCommand() {
-            if (currentLine.length > 0) {
-                currentLine = currentLine.slice(0, -1);
-                renderTerminal();
-                setTimeout(deleteCommand, 50);
-            } else {
-                commandIndex = (commandIndex + 1) % commands.length;
-                charIndex = 0;
-                setTimeout(typeCommand, 500);
+                setTimeout(() => {
+                    currentCommand = '';
+                    charIndex = 0;
+                    commandIndex = (commandIndex + 1) % commands.length;
+                    renderTerminal();
+                    setTimeout(typeCommand, 500);
+                }, 1000);
             }
         }
 
         function renderTerminal() {
-            terminal.innerHTML = `<div class="terminal-line"><span class="typed-text">${currentLine}</span></div>`;
+            terminal.innerHTML += `<div class="terminal-line">kdev@world:~$ ${currentCommand}</div>`;
+            terminal.scrollTop = terminal.scrollHeight;
         }
 
         typeCommand();
