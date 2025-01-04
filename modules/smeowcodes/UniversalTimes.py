@@ -11,7 +11,7 @@
 # ---------------------------------------------------------------------------------
 
 
-__version__ = (2, 0, 1)
+__version__ = (2, 0, 2)
 
 # module by:
 # █▀ █▄▀ █ █░░ █░░ ▀█
@@ -24,7 +24,7 @@ __version__ = (2, 0, 1)
 # 🔒 Licensed under the AGPL-3.0
 # 🌐 https://www.gnu.org/licenses/agpl-3.0.html
 
-# meta developers: @smeowcodes, @kdevwp
+# meta developer: @smeowcodes, @kdevwp
 
 import calendar as c
 import datetime
@@ -133,7 +133,7 @@ class MyTimeMod(loader.Module):
 
     @loader.unrestricted
     async def mytimecmd(self, message: Message):
-        "open a manager"
+        "– Открыть инлайн-менеджер."
         list = [
             "ваша сессия спижжена рофлановым",
         ]
@@ -261,6 +261,7 @@ class MyTimeMod(loader.Module):
         )
 
     async def timezonescmd(self, message: Message):
+        "– Часовые пояса."
         await self.inline.form(
             message=message,
             text="Timezones",
