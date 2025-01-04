@@ -3,9 +3,9 @@
 # ( o.o )  🔐 Licensed under the GNU AGPLv3.
 #  > ^ <   ⚠️ Owner of heta.hikariatama.ru doesn't take any responsibilities or intellectual property rights regarding this script
 # ---------------------------------------------------------------------------------
-# Name: MyTime
-# Description: Чючют крутой модуль
-# Author: skillzmeow
+# Name: UniversalTimes
+# Description: Модуль для установки дат по типу "сколько до дня рождения", или посмотреть часовой пояс какого-нибудь городка.
+# Author: skillzmeow    
 # Commands:
 # .mytime | .timezones
 # ---------------------------------------------------------------------------------
@@ -20,11 +20,11 @@ __version__ = (2, 0, 1)
 # █▀▄▀█ █▀▀ █▀█ █░█░█
 # █░▀░█ ██▄ █▄█ ▀▄▀▄▀
 #   you can edit this module
-#            2022
+#            2022 - 2025
 # 🔒 Licensed under the AGPL-3.0
 # 🌐 https://www.gnu.org/licenses/agpl-3.0.html
 
-# meta developer: @smeowcodes, @kdevwp
+# meta developers: @smeowcodes, @kdevwp
 
 import calendar as c
 import datetime
@@ -42,10 +42,10 @@ logger = logging.getLogger(__name__)
 
 
 class MyTimeMod(loader.Module):
-    """Чючют крутой модуль"""
+    """Модуль для установки дат по типу "сколько до дня рождения", или посмотреть часовой пояс какого-нибудь городка."""
 
     strings = {
-        "name": "MyTime",
+        "name": "UniversalTimes",
         "time": "📡 Accuracy time",
         "cancel_btn": "🚫 Close",
         "back_btn": "⏪ Back",
@@ -135,11 +135,7 @@ class MyTimeMod(loader.Module):
     async def mytimecmd(self, message: Message):
         "open a manager"
         list = [
-            "модуль от скиллза",
-            "в хикке только кнопочки и смайлики...",
-            "че за хрень?",
-            "хочу фтг",
-            "ваша сессия спижжена скилзом",
+            "ваша сессия спижжена рофлановым",
         ]
         hz = random.choice(list)
         args = utils.get_args_raw(message)
