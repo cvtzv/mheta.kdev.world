@@ -16,6 +16,7 @@
             min-height: 100vh;
             background: #1e1e1e;
             color: #c5c6c7;
+            user-select: none; /* Отключение выделения текста */
         }
 
         .content {
@@ -93,6 +94,10 @@
             }
         }
     </style>
+    <script>
+        // Отключение контекстного меню
+        document.addEventListener('contextmenu', event => event.preventDefault());
+    </script>
 </head>
 <body>
     <div class="content">
