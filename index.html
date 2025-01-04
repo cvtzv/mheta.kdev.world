@@ -24,17 +24,19 @@
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 600px;
         }
 
         .title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 1rem;
             font-weight: bold;
             color: #61dafb;
         }
 
         .subtitle {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #abb2bf;
             margin-bottom: 2rem;
         }
@@ -48,28 +50,10 @@
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
             text-align: left;
             width: 100%;
-            max-width: 600px;
-            height: 200px;
+            height: 100px;
             overflow: hidden;
             position: relative;
             font-family: 'Courier New', monospace;
-        }
-
-        .terminal-line {
-            color: #61dafb;
-        }
-
-        .terminal-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            overflow-y: auto;
         }
 
         @keyframes blink {
@@ -79,11 +63,30 @@
         }
 
         .typed-text {
-            display: inline-block;
+            display: inline;
             white-space: nowrap;
             overflow: hidden;
             border-right: 2px solid #61dafb;
             animation: blink 0.7s step-end infinite;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 1rem;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .terminal {
+                font-size: 0.9rem;
+                height: 80px;
+            }
         }
     </style>
 </head>
@@ -91,15 +94,14 @@
     <div class="content">
         <div class="title">Мир Квт Рофланова</div>
         <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Хикки.</div>
-        <div class="terminal">
-            <div class="terminal-content" id="terminal">
-                <!-- Commands will dynamically appear here -->
-            </div>
+        <div class="terminal" id="terminal">
+            kdev@world:~$ <span class="typed-text" id="typed-text"></span>
         </div>
     </div>
 
     <script>
         const terminal = document.getElementById('terminal');
+        const typedText = document.getElementById('typed-text');
 
         const commands = [
             'sudo reboot',
@@ -111,28 +113,26 @@
 
         let commandIndex = 0;
         let charIndex = 0;
-        let currentCommand = '';
 
         function typeCommand() {
             if (charIndex < commands[commandIndex].length) {
-                currentCommand += commands[commandIndex][charIndex];
+                typedText.textContent += commands[commandIndex][charIndex];
                 charIndex++;
-                renderTerminal();
                 setTimeout(typeCommand, 100);
             } else {
-                setTimeout(() => {
-                    currentCommand = '';
-                    charIndex = 0;
-                    commandIndex = (commandIndex + 1) % commands.length;
-                    renderTerminal();
-                    setTimeout(typeCommand, 500);
-                }, 1000);
+                setTimeout(deleteCommand, 1000);
             }
         }
 
-        function renderTerminal() {
-            terminal.innerHTML += `<div class="terminal-line">kdev@world:~$ ${currentCommand}</div>`;
-            terminal.scrollTop = terminal.scrollHeight;
+        function deleteCommand() {
+            if (typedText.textContent.length > 0) {
+                typedText.textContent = typedText.textContent.slice(0, -1);
+                setTimeout(deleteCommand, 50);
+            } else {
+                commandIndex = (commandIndex + 1) % commands.length;
+                charIndex = 0;
+                setTimeout(typeCommand, 500);
+            }
         }
 
         typeCommand();
