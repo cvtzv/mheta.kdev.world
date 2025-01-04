@@ -9,33 +9,103 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Courier New', monospace;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-            color: #333;
+            background: #1e1e1e;
+            color: #c5c6c7;
         }
 
         .content {
             text-align: center;
-            background: rgba(255, 255, 255, 0.8);
+            background: #282c34;
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
 
         .title {
             font-size: 2.5rem;
             margin-bottom: 1rem;
             font-weight: bold;
-            color: #5d5d5d;
+            color: #61dafb;
         }
 
         .subtitle {
             font-size: 1.2rem;
-            color: #7a7a7a;
+            color: #abb2bf;
+            margin-bottom: 2rem;
+        }
+
+        .terminal {
+            background: #1e1e1e;
+            color: #61dafb;
+            font-size: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal::before {
+            content: 'kdev@world:~$';
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #c5c6c7;
+        }
+
+        .line {
+            display: block;
+            color: #61dafb;
+            white-space: nowrap;
+        }
+
+        @keyframes typing {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        @keyframes blink {
+            50% {
+                border-color: transparent;
+            }
+        }
+
+        .typed-text {
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #61dafb;
+            animation: blink 0.7s step-end infinite;
+        }
+
+        .terminal-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
+        }
+
+        .terminal-line {
+            color: #61dafb;
         }
     </style>
 </head>
@@ -43,6 +113,56 @@
     <div class="content">
         <div class="title">Мир Квт Рофланова</div>
         <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Хикки.</div>
+        <div class="terminal">
+            <div class="terminal-content" id="terminal">
+                <!-- Commands will appear here -->
+            </div>
+        </div>
     </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+
+        const commands = [
+            'sudo reboot',
+            'ls -la /home',
+            'cat /etc/passwd',
+            'whoami',
+            'echo "Hello, World!"'
+        ];
+
+        let commandIndex = 0;
+        let charIndex = 0;
+        let currentLine = '';
+
+        function typeCommand() {
+            if (charIndex < commands[commandIndex].length) {
+                currentLine += commands[commandIndex][charIndex];
+                charIndex++;
+                renderTerminal();
+                setTimeout(typeCommand, 100);
+            } else {
+                setTimeout(deleteCommand, 1000);
+            }
+        }
+
+        function deleteCommand() {
+            if (currentLine.length > 0) {
+                currentLine = currentLine.slice(0, -1);
+                renderTerminal();
+                setTimeout(deleteCommand, 50);
+            } else {
+                commandIndex = (commandIndex + 1) % commands.length;
+                charIndex = 0;
+                setTimeout(typeCommand, 500);
+            }
+        }
+
+        function renderTerminal() {
+            terminal.innerHTML = `<div class="terminal-line"><span class="typed-text">${currentLine}</span></div>`;
+        }
+
+        typeCommand();
+    </script>
 </body>
 </html>
