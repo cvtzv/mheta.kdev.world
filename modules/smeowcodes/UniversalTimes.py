@@ -265,7 +265,6 @@ class UniversalTimesMod(loader.Module):
         await self.inline.form(
             message=message,
             text="Timezones",
-            reply_markup=self._get_mark(),
             **({"photo": "https://0x0.st/oBvb.jpg"}),
         )
 
