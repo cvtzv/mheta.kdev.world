@@ -1,81 +1,187 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>.cvt roflannov - World.</title>
+    <title>.cvt roflannov - MHeta.</title>
     <style>
-        body {
+        :root {
+            --bg-color: #0a0e12;
+            --terminal-bg: #1a1d21;
+            --primary-color: #00ff9d;
+            --text-color: #e0e0e0;
+            --accent-color: #ff3e3e;
+            --secondary-color: #4a9eff;
+        }
+
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Courier New', monospace;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            background: #1e1e1e;
-            color: #c5c6c7;
-            user-select: none; /* Отключение выделения текста */
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
         }
 
         .content {
-            text-align: center;
-            background: #282c34;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
+            background: var(--terminal-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0, 255, 157, 0.1),
+                        0 0 60px rgba(0, 255, 157, 0.05);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 157, 0.1);
         }
 
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            opacity: 0.8;
+        }
+
+        .control:nth-child(1) { background: #ff5f56; }
+        .control:nth-child(2) { background: #ffbd2e; }
+        .control:nth-child(3) { background: #27c93f; }
+
         .title {
-            font-size: 2rem;
+            font-size: 2.5rem;
+            color: var(--primary-color);
             margin-bottom: 1rem;
-            font-weight: bold;
-            color: #61dafb;
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
         }
 
         .subtitle {
-            font-size: 1rem;
-            color: #abb2bf;
+            font-size: 1.1rem;
+            color: var(--text-color);
             margin-bottom: 2rem;
+            opacity: 0.8;
+            line-height: 1.5;
         }
 
         .terminal {
-            background: #1e1e1e;
-            color: #61dafb;
-            font-size: 1rem;
-            padding: 1rem;
-            border-radius: 5px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-            text-align: left;
-            width: calc(100% - 2rem);
-            height: 100px;
-            overflow: hidden;
+            background: rgba(10, 14, 18, 0.95);
+            padding: 1.5rem;
+            border-radius: 10px;
             position: relative;
-            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            min-height: 150px;
+            border: 1px solid rgba(0, 255, 157, 0.2);
         }
 
-        .terminal span.command {
-            color: #c678dd;
+        .terminal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                var(--primary-color), 
+                var(--secondary-color), 
+                var(--accent-color));
+            opacity: 0.7;
         }
 
-        @keyframes blink {
-            50% {
-                border-color: transparent;
-            }
+        .prompt {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+
+        .command {
+            color: var(--primary-color);
         }
 
         .typed-text {
             display: inline;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 2px solid #61dafb;
-            animation: blink 0.7s step-end infinite;
+            position: relative;
+            color: var(--text-color);
         }
 
-        @media (max-width: 600px) {
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: var(--primary-color);
+            margin-left: 5px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .terminal:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 1.5rem;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .terminal {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
             .content {
                 padding: 1rem;
             }
@@ -87,30 +193,57 @@
             .subtitle {
                 font-size: 0.9rem;
             }
-
-            .terminal {
-                font-size: 0.9rem;
-                height: 80px;
-            }
         }
     </style>
-    <script>
-        // Отключение контекстного меню
-        document.addEventListener('contextmenu', event => event.preventDefault());
-    </script>
 </head>
 <body>
+    <canvas class="matrix-bg" id="matrix"></canvas>
     <div class="content">
-        <div class="title">kdev.world</div>
-        <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Hikka OR Heroku.</div>
-        <div class="terminal" id="terminal">
-            <span class="prompt">kdev@world:~$</span> <span class="typed-text" id="typed-text"></span>
+        <div class="window-controls">
+            <div class="control"></div>
+            <div class="control"></div>
+            <div class="control"></div>
+        </div>
+        <div class="title">mheta.kdev.world</div>
+        <div class="subtitle">Магией можно узнать путь до секретных отредактированных модулей для Hikka / Heroku.</div>
+        <div class="terminal">
+            <span class="prompt">kdev@world:~$</span>
+            <span class="typed-text" id="typed-text"></span>
+            <span class="cursor"></span>
         </div>
     </div>
 
     <script>
-        const terminal = document.getElementById('terminal');
-        const typedText = document.getElementById('typed-text');
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = "アカサタナハマヤラワガザダバパイキシチニヒミリヰギジヂビピウクスツヌフムユルグズブヅプエケセテネヘメレヱゲゼデベペオコソトノホモヨロヲゴゾドボポヴッン";
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 14, 18, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = `${fontSize}px monospace`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
 
         const commands = [
             'ls -la /index',
@@ -123,6 +256,7 @@
 
         let commandIndex = 0;
         let charIndex = 0;
+        const typedText = document.getElementById('typed-text');
 
         function typeCommand() {
             if (charIndex < commands[commandIndex].length) {
@@ -130,7 +264,7 @@
                 charIndex++;
                 setTimeout(typeCommand, 100);
             } else {
-                setTimeout(deleteCommand, 1000);
+                setTimeout(deleteCommand, 2000);
             }
         }
 
@@ -146,6 +280,13 @@
         }
 
         typeCommand();
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     </script>
 </body>
 </html>
