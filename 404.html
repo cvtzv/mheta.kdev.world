@@ -1,81 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Page Not Found</title>
+    <title>.cvt roflannov - 404 Page Not Found.</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             display: flex;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #2e3440, #4c566a);
-            color: #eceff4;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .content {
             text-align: center;
+            color: white;
+            z-index: 1;
+            padding: 20px;
         }
 
-        .container {
-            max-width: 600px;
-            padding: 1rem;
-        }
-
-        h1 {
-            font-size: 6rem;
+        .error-code {
+            font-size: 10em;
             margin: 0;
-            color: #bf616a;
+            background: linear-gradient(45deg, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h2 {
+            font-size: 2em;
+            margin: 20px 0;
+            color: #a78bfa;
         }
 
         p {
-            font-size: 1.5rem;
-            margin: 1rem 0;
-            color: #d8dee9;
+            font-size: 1.2em;
+            color: #d1d5db;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
         }
 
-        a {
+        .back-button {
             display: inline-block;
-            margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            color: #eceff4;
-            background: #5e81ac;
-            border-radius: 5px;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #a78bfa, #8b5cf6);
+            color: white;
             text-decoration: none;
-            transition: background 0.3s ease;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        a:hover {
-            background: #81a1c1;
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 4rem;
-            }
+        .astronaut {
+            font-size: 100px;
+            animation: spin 20s linear infinite;
+            display: inline-block;
+            margin: 20px 0;
+        }
 
-            p {
-                font-size: 1.2rem;
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-            a {
-                font-size: 0.9rem;
-                padding: 0.5rem 1rem;
-            }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
     </style>
-    <script>
-        document.addEventListener('contextmenu', (event) => event.preventDefault());
-        document.addEventListener('selectstart', (event) => event.preventDefault());
-    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>404</h1>
-        <p>Oops! The page you are looking for does not exist.</p>
-        <a href="/">Go Back Home</a>
+    <div class="stars"></div>
+    <div class="content">
+        <div class="error-code">404</div>
+        <div class="astronaut">👨‍🚀</div>
+        <h2>Страница не найдена</h2>
+        <p>Похоже, вы забрели в неизведанные уголки космоса. Давайте вернемся на главную!</p>
+        <a href="/" class="back-button">Вернуться домой</a>
     </div>
+
+    <script>
+        function createStars() {
+            const stars = document.querySelector('.stars');
+            const count = 200;
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animation = `twinkle ${2 + Math.random() * 3}s infinite ${Math.random() * 2}s`;
+                
+                const size = Math.random() * 2;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                stars.appendChild(star);
+            }
+        }
+
+        createStars();
+    </script>
 </body>
 </html>
