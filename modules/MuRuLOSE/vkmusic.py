@@ -162,6 +162,7 @@ class VKMusic(loader.Module):
 
     @loader.command(ru_doc=" - Текущая песня")
     async def vkmpnow(self, message: Message):
+        "– Инструкция по получению токена."
         self._vkmusic = VKMusicAPI(str(self.config["user_id"]), str(self.config["token"]))
 
         music = await self._vkmusic.get_music()
@@ -232,4 +233,5 @@ class VKMusic(loader.Module):
 
     @loader.command(ru_doc=" - Инструкции для токена и пользовательского идентификатора")
     async def vkmtoken(self, message: Message):
+        "– Инструкция по получению токена."
         await utils.answer(message, self.strings["instructions"])
