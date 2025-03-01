@@ -1,3 +1,26 @@
+# ---------------------------------------------------------------------------------
+#  /\_/\  🌐 This module was loaded through https://t.me/hikkamods_bot
+# ( o.o )  🔐 Licensed under the GNU AGPLv3.
+#  > ^ <   ⚠️ Owner of heta.hikariatama.ru doesn't take any responsibilities or intellectual property rights regarding this script
+# ---------------------------------------------------------------------------------
+# Name: VKMusic
+# Description: vk music now
+# Author: BHikkaModules    
+# Commands:
+# .vkmpnow | .vkmtoken
+# ---------------------------------------------------------------------------------
+
+
+__version__ = (1, 0, 0)
+
+# module by: @BruhHikkaModules, modification: @kdevwp
+#   you can edit this module
+#            2022 - 2025
+# 🔒 Licensed under the AGPL-3.0
+# 🌐 https://www.gnu.org/licenses/agpl-3.0.html
+
+# meta developer: @BruhHikkaModules, @kdevwp
+
 from typing import Union, Dict
 import aiohttp
 from aiohttp.client_exceptions import ServerTimeoutError
@@ -36,7 +59,6 @@ class VKMusicAPI:
                 ) as response:
                     data: dict = await response.json()
                     if 'response' in data and len(data['response']) > 0:
-                        # VK может вернуть текущую позицию воспроизведения в поле progress
                         return data['response'][0].get('progress', 0)
                     return 0
         except Exception as e:
