@@ -146,9 +146,9 @@ class VKMusic(loader.Module):
             await self.client.delete_messages(bot_username, messages_to_delete)
             return None, None, None, 0
 
-    @loader.command(ru_doc=" - Текущая песня")
-    async def vkmpnow(self, message: Message):
-        "– Инструкция по получению токена."
+    @loader.command(alias='vkn')
+    async def vknow(self, message: Message):
+        "– Текущая песня."
         self._vkmusic = VKMusicAPI(str(self.config["user_id"]), str(self.config["token"]))
 
         music = await self._vkmusic.get_music()
@@ -205,7 +205,7 @@ class VKMusic(loader.Module):
         elif music == 30:
             await utils.answer(message, self.strings["server_error"])
 
-    @loader.command(ru_doc=" - Инструкции для токена и пользовательского идентификатора")
+    @loader.command(alias='vktonen')
     async def vkmtoken(self, message: Message):
-        "– Инструкция по получению токена."
+        "– Инструкции для токена и пользовательского идентификатора"
         await utils.answer(message, self.strings["instructions"])
