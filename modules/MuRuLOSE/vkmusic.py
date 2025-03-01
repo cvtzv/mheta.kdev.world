@@ -50,20 +50,6 @@ class VKMusicAPI:
                         return 40, data['response']['text']
         except ServerTimeoutError:
             return 30
-            
-    async def get_current_position(self, owner_id, audio_id):
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"https://api.vk.com/method/audio.getById?audios={owner_id}_{audio_id}&access_token={self.token}&v=5.199"
-                ) as response:
-                    data: dict = await response.json()
-                    if 'response' in data and len(data['response']) > 0:
-                        return data['response'][0].get('progress', 0)
-                    return 0
-        except Exception as e:
-            logger.error(f"Error getting current position: {e}")
-            return 0
 
 @loader.tds
 class VKMusic(loader.Module):
@@ -74,7 +60,7 @@ class VKMusic(loader.Module):
         "music_form": (
             "<emoji document_id=5222175680652917218>🎵</emoji> <b>Listening now:</b> <code>{title}</code>"
             "\n<emoji document_id=5269537556336222550>🐱</emoji> <b>Artist:</b> <code>{artist}</code>"
-            "\n<emoji document_id=5328274090262275771>🕓</emoji> <b>Duration:</b> <code>{current_time} | {total_time}</code>"
+            "\n<emoji document_id=5328274090262275771>🕓</emoji> <b>Duration:</b> <code>{total_time}</code>"
         ),
         "instructions": (
             "<b>Go to <a href='https://vkhost.github.io/'>vkhost</a>, open settings, leave anytime access and status,"
@@ -172,18 +158,9 @@ class VKMusic(loader.Module):
             artist = music[1]['audio']["artist"]
             url = music[1]['audio']["url"]
             
+            # Получаем только общую длительность трека
             duration = music[1]['audio'].get("duration", 0)
-            
-            owner_id = music[1]['audio'].get("owner_id")
-            audio_id = music[1]['audio'].get("id")
-            
-            if owner_id and audio_id:
-                current_position = await self._vkmusic.get_current_position(owner_id, audio_id)
-            else:
-                current_position = music[1]['audio'].get("progress", 0)
-            
             total_time = self.format_time(duration)
-            current_time = self.format_time(current_position)
             
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
@@ -197,7 +174,6 @@ class VKMusic(loader.Module):
                             caption=self.strings["music_form"].format(
                                 title=title, 
                                 artist=artist,
-                                current_time=current_time,
                                 total_time=total_time
                             )
                         )
@@ -210,7 +186,6 @@ class VKMusic(loader.Module):
 
             if document:
                 total_time = self.format_time(duration)
-                current_time = "0:00"
                 
                 file_name = f"{artist or 'Unknown'} - {title or 'Unknown'}.mp3".replace("/", "_").replace("\\", "_")
                 await utils.answer_file(
@@ -220,7 +195,6 @@ class VKMusic(loader.Module):
                     caption=self.strings["music_form"].format(
                         title=title or "Unknown",
                         artist=artist or "Unknown",
-                        current_time=current_time,
                         total_time=total_time
                     )
                 )
