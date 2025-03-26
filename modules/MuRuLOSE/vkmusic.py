@@ -187,7 +187,7 @@ async def _get_music_from_bot(self, query: str):
         return None, None, None
 
     @loader.command(ru_doc=" - Текущая песня")
-    async def vkn(self, message: Message):
+    async def vkmpnow(self, message: Message):
         """ - Current song"""
         self._vkmusic = VKMusicAPI(str(self.config["user_id"]), str(self.config["token"]))
 
@@ -218,6 +218,6 @@ async def _get_music_from_bot(self, query: str):
             await utils.answer(message, self.strings["server_error"])
 
     @loader.command(ru_doc=" - Инструкции для токена и пользовательского идентификатора")
-    async def vkt(self, message: Message):
+    async def vkmtoken(self, message: Message):
         """- Instructions for token and user ID"""
         await utils.answer(message, self.strings["instructions"])
