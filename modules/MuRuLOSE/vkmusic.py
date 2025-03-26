@@ -210,7 +210,7 @@ class VKMusic(loader.Module):
             return None, None, None
 
     @loader.command(ru_doc=" - Текущая песня")
-    async def vkmpnow(self, message: Message):
+    async def vkn(self, message: Message):
         """ - Current song"""
         self._vkmusic = VKMusicAPI(str(self.config["user_id"]), str(self.config["token"]))
 
@@ -241,6 +241,6 @@ class VKMusic(loader.Module):
             await utils.answer(message, self.strings["server_error"])
 
     @loader.command(ru_doc=" - Инструкции для токена и пользовательского идентификатора")
-    async def vkmtoken(self, message: Message):
+    async def vkt(self, message: Message):
         """- Instructions for token and user ID"""
         await utils.answer(message, self.strings["instructions"])
