@@ -130,19 +130,23 @@ async def _get_music_from_bot(self, query: str):
                 request = await conv.send_message(query)
                 messages_to_delete.append(request)
 
+                # Расширенная обработка ответа с увеличенным таймаутом
                 try:
                     response = await conv.get_response(timeout=15)
                     messages_to_delete.append(response)
                 except (TimeoutError, asyncio.TimeoutError):
+                    # Пытаемся перезапустить бота
                     await conv.send_message("/start")
                     start_response = await conv.get_response(timeout=10)
                     messages_to_delete.append(start_response)
                     
+                    # Повторяем запрос
                     request = await conv.send_message(query)
                     messages_to_delete.append(request)
                     response = await conv.get_response(timeout=15)
                     messages_to_delete.append(response)
 
+                # Улучшенная логика выбора музыки
                 selected_document = None
                 selected_title = None
                 selected_artist = None
@@ -150,6 +154,7 @@ async def _get_music_from_bot(self, query: str):
                 if hasattr(response, 'reply_markup') and response.reply_markup:
                     for row in response.reply_markup.rows:
                         for button in row.buttons:
+                            # Клик по первой доступной кнопке
                             await response.click(button)
                             file_response = await conv.get_response(timeout=15)
                             
@@ -165,6 +170,7 @@ async def _get_music_from_bot(self, query: str):
                                 if selected_document:
                                     break
 
+                # Если документ не нашли через кнопки
                 if not selected_document and response.media and isinstance(response.media, types.MessageMediaDocument):
                     document = response.media.document
                     for attr in document.attributes:
@@ -173,6 +179,7 @@ async def _get_music_from_bot(self, query: str):
                             selected_artist = attr.performer or "Unknown Artist"
                             selected_document = document
 
+                # Очистка сообщений
                 await self.client.delete_messages(bot_username, messages_to_delete)
                 
                 return selected_title, selected_artist, selected_document
@@ -181,6 +188,10 @@ async def _get_music_from_bot(self, query: str):
                 logger.error(f"Ошибка при работе с ботом: {e}")
                 await self.client.delete_messages(bot_username, messages_to_delete)
                 return None, None, None
+
+    except Exception as e:
+        logger.error(f"Критическая ошибка соединения с ботом: {e}")
+        return None, None, None
 
     except Exception as e:
         logger.error(f"Критическая ошибка соединения с ботом: {e}")
