@@ -121,93 +121,77 @@ class VKMusic(loader.Module):
         return simplified
 
     async def _get_music_from_bot(self, query: str):
-        bot_username = self.config["telegram_bot"]
-        messages_to_delete = []
-        
-        async with self.client.conversation(bot_username) as conv:
-            request = await conv.send_message(query)
-            messages_to_delete.append(request)
-
+    bot_username = self.config["telegram_bot"]
+    messages_to_delete = []
+    
+    try:
+        async with self.client.conversation(bot_username, timeout=20) as conv:
             try:
-                response = await conv.get_response(timeout=10)
-                messages_to_delete.append(response)
-            except TimeoutError:
-                await conv.send_message("/start")
-                messages_to_delete.append(await conv.get_response(timeout=5))
-                await conv.send_message(query)
-                messages_to_delete.append(await conv.get_response(timeout=10))
-                response = messages_to_delete[-1]
+                request = await conv.send_message(query)
+                messages_to_delete.append(request)
 
-            if not hasattr(response, 'reply_markup') or response.reply_markup is None:
-                await self.client.delete_messages(bot_username, messages_to_delete)
-                return None, None, None
+                # Расширенная обработка ответа с увеличенным таймаутом
+                try:
+                    response = await conv.get_response(timeout=15)
+                    messages_to_delete.append(response)
+                except (TimeoutError, asyncio.TimeoutError):
+                    # Пытаемся перезапустить бота
+                    await conv.send_message("/start")
+                    start_response = await conv.get_response(timeout=10)
+                    messages_to_delete.append(start_response)
+                    
+                    # Повторяем запрос
+                    request = await conv.send_message(query)
+                    messages_to_delete.append(request)
+                    response = await conv.get_response(timeout=15)
+                    messages_to_delete.append(response)
 
-            if hasattr(response.reply_markup, "rows"):
-                buttons = []
-                for row in response.reply_markup.rows:
-                    for button in row.buttons:
-                        if hasattr(button, "text"):
-                            buttons.append((button.text, button))
+                # Улучшенная логика выбора музыки
+                selected_document = None
+                selected_title = None
+                selected_artist = None
 
-                if not buttons:
-                    await self.client.delete_messages(bot_username, messages_to_delete)
-                    return None, None, None
+                if hasattr(response, 'reply_markup') and response.reply_markup:
+                    for row in response.reply_markup.rows:
+                        for button in row.buttons:
+                            # Клик по первой доступной кнопке
+                            await response.click(button)
+                            file_response = await conv.get_response(timeout=15)
+                            
+                            if file_response.media and isinstance(file_response.media, types.MessageMediaDocument):
+                                document = file_response.media.document
+                                for attr in document.attributes:
+                                    if isinstance(attr, types.DocumentAttributeAudio):
+                                        selected_title = attr.title or "Unknown Title"
+                                        selected_artist = attr.performer or "Unknown Artist"
+                                        selected_document = document
+                                        break
+                                
+                                if selected_document:
+                                    break
 
-                best_match = None
-                highest_similarity = 0.0
-                query_cleaned = self._clean_string(query)
-                query_simplified = self._simplify_query(query_cleaned)
-
-                for button_text, button in buttons:
-                    button_text_cleaned = self._clean_string(button_text)
-                    similarity = difflib.SequenceMatcher(None, query_cleaned, button_text_cleaned).ratio()
-                    if similarity > highest_similarity and similarity >= 0.5:
-                        highest_similarity = similarity
-                        best_match = button
-
-                if not best_match and query_simplified != query_cleaned:
-                    for button_text, button in buttons:
-                        button_text_cleaned = self._clean_string(button_text)
-                        similarity = difflib.SequenceMatcher(None, query_simplified, button_text_cleaned).ratio()
-                        if similarity > highest_similarity and similarity >= 0.5:
-                            highest_similarity = similarity
-                            best_match = button
-
-                if best_match:
-                    music_response = await response.click(button=best_match)
-                else:
-                    music_response = await response.click(0)
-
-                file_response = await conv.get_response(timeout=10)
-                messages_to_delete.append(file_response)
-
-                if file_response.media and isinstance(file_response.media, types.MessageMediaDocument):
-                    document = file_response.media.document
+                # Если документ не нашли через кнопки
+                if not selected_document and response.media and isinstance(response.media, types.MessageMediaDocument):
+                    document = response.media.document
                     for attr in document.attributes:
                         if isinstance(attr, types.DocumentAttributeAudio):
-                            title = attr.title or "Unknown Title"
-                            artist = attr.performer or "Unknown Artist"
-                            await self.client.delete_messages(bot_username, messages_to_delete)
-                            return title, artist, document
-                    await self.client.delete_messages(bot_username, messages_to_delete)
-                    return None, None, document
+                            selected_title = attr.title or "Unknown Title"
+                            selected_artist = attr.performer or "Unknown Artist"
+                            selected_document = document
+
+                # Очистка сообщений
+                await self.client.delete_messages(bot_username, messages_to_delete)
+                
+                return selected_title, selected_artist, selected_document
+
+            except Exception as e:
+                logger.error(f"Ошибка при работе с ботом: {e}")
                 await self.client.delete_messages(bot_username, messages_to_delete)
                 return None, None, None
-            else:
-                file_response = response
 
-            if file_response.media and isinstance(file_response.media, types.MessageMediaDocument):
-                document = file_response.media.document
-                for attr in document.attributes:
-                    if isinstance(attr, types.DocumentAttributeAudio):
-                        title = attr.title or "Unknown Title"
-                        artist = attr.performer or "Unknown Artist"
-                        await self.client.delete_messages(bot_username, messages_to_delete)
-                        return title, artist, document
-                await self.client.delete_messages(bot_username, messages_to_delete)
-                return None, None, document
-            await self.client.delete_messages(bot_username, messages_to_delete)
-            return None, None, None
+    except Exception as e:
+        logger.error(f"Критическая ошибка соединения с ботом: {e}")
+        return None, None, None
 
     @loader.command(ru_doc=" - Текущая песня")
     async def vkn(self, message: Message):
